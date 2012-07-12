@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Django Bookmarks - User Registration</title>
+  </head>
+  <body>
+    <h1>User Registration</h1>
+    <form method="post" action=".">
+      {% csrf_token %}
+      <p><label for="id_username">Username:</label>
+	{{ form.username }}</p>
+      <p><label for="id_password">Password:</label>
+	{{ form.password }}</p>
+      <p><label for="id_email">Email:</label>
+	{{ form.email }}</p>
+      <input type="hidden" name="next" value="/" />
+      <input type="submit" value="register" />
+    </form>
+  </body>
+</html>
