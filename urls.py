@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', logout_page),
     url(r'^register/$', register_page),
     url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':site_media}),
+    url(r'^save/$', bookmark_save_page),
     # Examples:
     # url(r'^$', 'django_bookmarks.views.home', name='home'),
     # url(r'^django_bookmarks/', include('django_bookmarks.foo.urls')),

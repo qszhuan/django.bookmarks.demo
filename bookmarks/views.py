@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django  import *
-
+from bookmarks.models import *
 from bookmarks.forms import *
 
 def main_page(request):
@@ -41,3 +41,29 @@ def register_page(request):
   variables = RequestContext(request, {'form':form})
     
   return render_to_response('registration/reg.html', variables)
+
+def bookmark_save_page(request):
+  if request.method == 'POST':
+    form = BookmarkSaveForm(request.POST)
+    if form.is_valid():
+      link, dummy = Link.objects.get_or_create(url = form.cleaned_data['url'])
+      bookmark, created = Bookmark.objects.get_or_create(user = request.user, link = link)
+      bookmark.title = form.cleaned_data['title']
+
+      if not created:
+        bookmark.tag_set.clear()
+      tagnames = form.cleaned_data['tags'].split()
+      for tagname in tagnames:
+        tag, dummy = Tag.objects.get_or_create(name=tagname)
+        bookmark.tag_set.add(tag)
+      bookmark.save()
+      return HttpResponseRedirect('/user/%s/' % request.user.username)
+  else:
+    form = BookmarkSaveForm()
+
+  variables = RequestContext(request, {'form':form})
+  return render_to_response('bookmark_save.html', variables)
+
+
+
+                                               
