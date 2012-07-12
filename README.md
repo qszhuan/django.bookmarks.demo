@@ -1,0 +1,2 @@
+django.bookmarks.demo
+=====================
