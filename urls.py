@@ -10,13 +10,21 @@ import os
 site_media = os.path.join(os.path.dirname(__file__), 'site_media')
     
 urlpatterns = patterns('',
+    #browsing
     url(r'^$', main_page),
     url(r'^user/(\w+)/$',  user_page),
+
+    #session management                   
     url(r'^login/$', 'django.contrib.auth.views.login'),
     url(r'^logout/$', logout_page),
     url(r'^register/$', register_page),
     url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':site_media}),
+
+    #account management
     url(r'^save/$', bookmark_save_page),
+
+    url(r'^tag/([^\s]+)/$', tag_page),
+    url(r'^tag$', tag_cloud_page),
     # Examples:
     # url(r'^$', 'django_bookmarks.views.home', name='home'),
     # url(r'^django_bookmarks/', include('django_bookmarks.foo.urls')),

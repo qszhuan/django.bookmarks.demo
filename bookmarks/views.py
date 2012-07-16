@@ -12,18 +12,24 @@ from django  import *
 from bookmarks.models import *
 from bookmarks.forms import *
 
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import get_object_or_404
+
 def main_page(request):
   return render_to_response('main_page.html', RequestContext(request))
 
 def user_page(request, username):
-  try:
-    user = User.objects.get(username=username)
-  except User.DoesNotExist:
-    raise Http404(u'Requested user not found.')
-  bookmarks = user.bookmark_set.all()
-  variables = RequestContext(request, {'username':username, 'bookmarks':bookmarks})
+  user = get_object_or_404(User, username=username)
+  bookmarks = user.bookmark_set.order_by("-id")
+  variables = RequestContext(request, {'username':username, 'bookmarks':bookmarks, 'show_tags':True})
   return render_to_response('user_page.html', variables)
 
+def tag_page(request, tag_name):
+  tag = get_object_or_404(Tag, name=tag_name)
+  bookmarks = tag.bookmarks.order_by('-id')
+  variables = RequestContext(request, {'bookmarks':bookmarks, 'tag_name':tag_name, 'show_tags':True, 'show_user':True})
+  return render_to_response('tag_page.html', variables)
 
 def logout_page(request):
   logout(request)
@@ -42,6 +48,7 @@ def register_page(request):
     
   return render_to_response('registration/reg.html', variables)
 
+@login_required
 def bookmark_save_page(request):
   if request.method == 'POST':
     form = BookmarkSaveForm(request.POST)
@@ -67,3 +74,27 @@ def bookmark_save_page(request):
 
 
                                                
+def tag_cloud_page(request):
+     MAX_WEIGHT = 5
+     tags = Tag.objects.order_by('name')
+     # Calculate tag, min and max counts.
+     min_count = max_count = tags[0].bookmarks.count()
+     for tag in tags:
+       tag.count = tag.bookmarks.count()
+       if tag.count < min_count:
+         min_count = tag.count
+       if max_count < tag.count:
+         max_count = tag.count
+     # Calculate count range. Avoid dividing by zero.
+     range = float(max_count - min_count)
+     if range == 0.0:
+       range = 1.0
+     # Calculate tag weights.
+     for tag in tags:
+       tag.weight = int(
+         MAX_WEIGHT * (tag.count+1 - min_count) / range
+       )
+     variables = RequestContext(request, {
+       'tags': tags
+     })
+     return render_to_response('tag_cloud_page.html', variables)
