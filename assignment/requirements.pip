@@ -1,0 +1,13 @@
+CouchDB==0.8
+ipython
+gdata
+coverage==3.4
+simplejson
+mock
+iso8601
+pytz
+xlwt
+jinja2
+xmldict
+lxml
+networkx
